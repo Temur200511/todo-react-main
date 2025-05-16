@@ -294,3 +294,18 @@ body {
   opacity: 1;
 }
 /* End checkbox styles */
+
+
+/* Add this to your existing CSS */
+.language-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+@media screen and (min-width: 550px) {
+  .language-toggle {
+    top: 2rem;
+    right: 2rem;
+  }
+}

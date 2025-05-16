@@ -20,16 +20,42 @@ const FILTER_MAP = {
 
 const FILTER_NAMES = Object.keys(FILTER_MAP);
 
+// Translation dictionary
+const TRANSLATIONS = {
+  en: {
+    appTitle: "TodoMatic",
+    addTask: "Add Task",
+    tasksRemaining: (count) => `${count} ${count !== 1 ? "tasks" : "task"} remaining`,
+    filters: {
+      All: "All",
+      Active: "Active",
+      Completed: "Completed"
+    }
+  },
+  uz: {
+    appTitle: "TodoMatic",
+    addTask: "Vazifa qo'shish",
+    tasksRemaining: (count) => `${count} ta ${count !== 1 ? "vazifa" : "vazifa"} qoldi`,
+    filters: {
+      All: "Hammasi",
+      Active: "Aktiv",
+      Completed: "Yakunlangan"
+    }
+  }
+};
+
 function App(props) {
   const [tasks, setTasks] = useState(props.tasks);
   const [filter, setFilter] = useState("All");
+  const [language, setLanguage] = useState("en"); // 'en' or 'uz'
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === "en" ? "uz" : "en");
+  };
 
   function toggleTaskCompleted(id) {
     const updatedTasks = tasks.map((task) => {
-      // if this task has the same ID as the edited task
       if (id === task.id) {
-        // use object spread to make a new obkect
-        // whose `completed` prop has been inverted
         return { ...task, completed: !task.completed };
       }
       return task;
@@ -44,12 +70,9 @@ function App(props) {
 
   function editTask(id, newName) {
     const editedTaskList = tasks.map((task) => {
-      // if this task has the same ID as the edited task
       if (id === task.id) {
-        // Copy the task and update its name
         return { ...task, name: newName };
       }
-      // Return the original task if it's not the edited task
       return task;
     });
     setTasks(editedTaskList);
@@ -72,7 +95,7 @@ function App(props) {
   const filterList = FILTER_NAMES.map((name) => (
     <FilterButton
       key={name}
-      name={name}
+      name={TRANSLATIONS[language].filters[name] || name}
       isPressed={name === filter}
       setFilter={setFilter}
     />
@@ -83,8 +106,7 @@ function App(props) {
     setTasks([...tasks, newTask]);
   }
 
-  const tasksNoun = taskList.length !== 1 ? "tasks" : "task";
-  const headingText = `${taskList.length} ${tasksNoun} remaining`;
+  const headingText = TRANSLATIONS[language].tasksRemaining(taskList.length);
 
   const listHeadingRef = useRef(null);
   const prevTaskLength = usePrevious(tasks.length);
@@ -97,8 +119,17 @@ function App(props) {
 
   return (
     <div className="todoapp stack-large">
-      <h1>TodoMatic</h1>
-      <Form addTask={addTask} />
+      <div className="language-toggle">
+        <button 
+          onClick={toggleLanguage}
+          className="btn btn__primary"
+          style={{ fontSize: '1.2rem', padding: '0.5rem 1rem' }}
+        >
+          {language === 'en' ? 'UZB' : 'ENG'}
+        </button>
+      </div>
+      <h1>{TRANSLATIONS[language].appTitle}</h1>
+      <Form addTask={addTask} placeholder={TRANSLATIONS[language].addTask} />
       <div className="filters btn-group stack-exception">{filterList}</div>
       <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
         {headingText}
